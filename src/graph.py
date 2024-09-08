@@ -27,6 +27,9 @@ def gera_grafo(v: list, a: list) -> nx.Graph:
 def degree_heuristic(u: str, v: str, g: nx.Graph):
     return abs(g.degree(u) - g.degree(v))
 
+def heuristic_dijkstra(u: str, v: str, grafo: nx.Graph):
+    return 0
+
 def a_star_custom(g: nx.Graph, start: str, goal: str, heuristic) -> tuple:
     open_set = []
     heapq.heappush(open_set, (0, start))
@@ -113,15 +116,16 @@ def dfs(g: nx.Graph, start: str, goal: str) -> tuple:
     return [], len(explored_nodes), 0
 
 
-def resultados_Astar(start: str, destinos: list, grafo: nx.Graph) -> dict:
+def resultados_Astar(start: str, destinos: list, grafo: nx.Graph, heuristic) -> dict:
     current_node = start
-    total_path = []
-    total_cost = 0
+
+    total_path = [start]
+    total_cost = 0.1
     total_explored = 0
     
     for destination in destinos:
         # A* Algorithm
-        path, explored_nodes, cost = a_star_custom(grafo, current_node, destination, degree_heuristic)
+        path, explored_nodes, cost = a_star_custom(grafo, current_node, destination, heuristic)
         if not path:
             print(f"ERRO: Não há caminho entre {current_node} e {destination}!")
             return {'path': [], 'explored': 0, 'cost': 0}
@@ -136,8 +140,8 @@ def resultados_Astar(start: str, destinos: list, grafo: nx.Graph) -> dict:
 def resultados_BFS(start: str, destinos: list, grafo: nx.Graph) -> dict:
     
     current_node = start
-    total_path = []
-    total_cost = 0
+    total_path = [start]
+    total_cost = 0.1
     total_explored = 0
 
     for i in range(0, len(destinos)):
@@ -156,8 +160,8 @@ def resultados_BFS(start: str, destinos: list, grafo: nx.Graph) -> dict:
 def resultados_DFS(start: str, destinos: list, grafo: nx.Graph) -> dict:
     
     current_node = start
-    total_path = []
-    total_cost = 0
+    total_path = [start]
+    total_cost = 0.1
     total_explored = 0
 
     for i in range(0, len(destinos)):
@@ -178,17 +182,16 @@ def plota_grafo(g: nx.Graph, algoritmo: str, caminho: list = []):
     plt.figure(figsize=(12, 12))
     pos = nx.spring_layout(g, seed=31, k=7)
     
-    # Desenhar o grafo completo
+    # Desenha os nós
     nx.draw(g, pos, with_labels=True, node_size=500, node_color="skyblue", font_size=10, font_weight='bold', edge_color="gray")
     
     path_edges = []
-    # Destacar o caminho encontrado
+    # Destaca o caminho encontrado
     if(caminho):
         path_edges = list(zip(caminho, caminho[1:]))  # Converte o caminho em uma lista de arestas
     
     nx.draw_networkx_edges(g, pos, edgelist=path_edges, edge_color="red", width=3)
     
-    # Desenha os pesos das arestas
     labels = nx.get_edge_attributes(g, 'weight')
     nx.draw_networkx_edge_labels(g, pos, edge_labels=labels)
 
@@ -202,18 +205,19 @@ def print_resultados(algoritmo: str, resultados: dict, plot: bool = False):
     print(f"  Caminho encontrado: {resultados['path']}")
     print(f"  Número total de nós explorados: {resultados['explored']}")
     print(f"  Custo total do caminho: {resultados['cost']}")
-    
+
     if plot:
         plota_grafo(grafo, algoritmo, resultados['path'])
 
-# Exemplo de uso
+
 if __name__ == "__main__":
     vertice, arcos = preenche_listas()
+
     grafo = gera_grafo(vertice, arcos)
 
     destinos = ["J.K", "Peixe Vivo", "Barro Preto"]
     
-    resultados = resultados_DFS("Loja-SUPREMA", destinos, grafo)
+    resultados = resultados_Astar("Loja-SUPREMA", destinos, grafo, heuristic_dijkstra)
 
-    print_resultados("DFS", resultados, plot=True)
+    print_resultados("Astar_Dijkstra", resultados, plot=True)
 
