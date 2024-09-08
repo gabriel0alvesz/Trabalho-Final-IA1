@@ -25,6 +25,7 @@ def gera_grafo(v: list, a: list) -> nx.Graph:
     return grafo
 
 def degree_heuristic(u: str, v: str, g: nx.Graph):
+    # print(f"{u} -> {v} = {g.degree(u) - g.degree(v)}")
     return abs(g.degree(u) - g.degree(v))
 
 def heuristic_dijkstra(u: str, v: str, grafo: nx.Graph):
@@ -115,6 +116,17 @@ def dfs(g: nx.Graph, start: str, goal: str) -> tuple:
     
     return [], len(explored_nodes), 0
 
+def caminho_total_real(caminho: list, grafo: nx.Graph) -> float:
+    custo_total: float = 0.0
+
+    for i in range(len(caminho) - 1):
+        no_atual = caminho[i]
+        proximo_no = caminho[i + 1]
+        
+        if grafo.has_edge(no_atual, proximo_no):
+            custo_total += grafo[no_atual][proximo_no]['weight']
+    
+    return custo_total
 
 def resultados_Astar(start: str, destinos: list, grafo: nx.Graph, heuristic) -> dict:
     current_node = start
@@ -135,7 +147,8 @@ def resultados_Astar(start: str, destinos: list, grafo: nx.Graph, heuristic) -> 
         total_explored += explored_nodes
         current_node = destination
     
-    return {'path': total_path, 'explored': total_explored, 'cost': total_cost}
+    
+    return {'path': total_path, 'explored': total_explored, 'cost': total_cost, 'cost_real_path': caminho_total_real(total_path, grafo)}
 
 def resultados_BFS(start: str, destinos: list, grafo: nx.Graph) -> dict:
     
@@ -200,12 +213,18 @@ def plota_grafo(g: nx.Graph, algoritmo: str, caminho: list = []):
 
 
 def print_resultados(algoritmo: str, resultados: dict, plot: bool = False):
-
+    print(f"Grafo: {grafo}\n")
     print(algoritmo)    
     print(f"  Caminho encontrado: {resultados['path']}")
     print(f"  Número total de nós explorados: {resultados['explored']}")
-    print(f"  Custo total do caminho: {resultados['cost']}")
-
+   
+    
+    if algoritmo == "Astar_Grau" or algoritmo == "Astar_Dijkstra":
+        print(f"  Custo real do caminho: {round(resultados['cost_real_path'], 2)}")
+    else:{
+         print(f"  Custo total do caminho: {round(resultados['cost'],3)}")
+    }
+        
     if plot:
         plota_grafo(grafo, algoritmo, resultados['path'])
 
