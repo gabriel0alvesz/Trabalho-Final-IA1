@@ -195,13 +195,13 @@ def plota_grafo(g: nx.Graph, algoritmo: str, caminho: list = []):
     plt.figure(figsize=(12, 12))
     pos = nx.spring_layout(g, seed=31, k=7)
     
-    # Desenha os nós
+    
     nx.draw(g, pos, with_labels=True, node_size=500, node_color="skyblue", font_size=10, font_weight='bold', edge_color="gray")
     
     path_edges = []
-    # Destaca o caminho encontrado
+    
     if(caminho):
-        path_edges = list(zip(caminho, caminho[1:]))  # Converte o caminho em uma lista de arestas
+        path_edges = list(zip(caminho, caminho[1:]))  
     
     nx.draw_networkx_edges(g, pos, edgelist=path_edges, edge_color="red", width=3)
     
